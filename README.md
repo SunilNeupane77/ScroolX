@@ -1,38 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📱 ScrollX – The Modern Reels Upload Platform
 
-## Getting Started
+ScrollX is a sleek, high-performance short video (reels) sharing platform built with the modern web stack. Users can upload short reels (up to **20MB**) and engage with dynamic, mobile-first content. 
 
-First, run the development server:
+ScrollX is crafted with performance, design, and scalability in mind.
+
+---
+
+## 🚀 Features
+
+- 🔄 Upload short videos (up to 20MB) powered by **ImageKit**
+- 💨 Lightning-fast UI with **Next.js 14**
+- 🎨 Beautifully styled using **TailwindCSS** + **ShadCN UI**
+- 🧠 Strongly typed backend with **Prisma ORM** and **TypeScript**
+- 🧾 PostgreSQL database schema with clear relational modeling
+- 🔐 User authentication integrated with **Clerk**
+
+---
+
+## 🧱 Tech Stack
+
+| Tech          | Purpose                            |
+|---------------|------------------------------------|
+| **Next.js**   | Full-stack React framework         |
+| **Tailwind**  | Utility-first CSS for styling      |
+| **Prisma**    | Type-safe database ORM             |
+| **PostgreSQL**| Primary relational database        |
+| **Clerk**     | Authentication & user management   |
+| **ImageKit**  | Video storage & optimization       |
+| **TypeScript**| Type safety across the stack       |
+
+---
+
+## 📸 Video Upload Configuration
+
+- Uploads are handled via **ImageKit**
+- Max file size: **20MB**
+- File types: `video/mp4`, `video/webm`, etc.
+- Validations ensure performance and responsiveness
+
+---
+
+---
+
+## 🛠️ Setup & Installation
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/SunilNeupane77/scrollx.git
+cd scrollx
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment variables
+cp .env.example .env
+# Add your DATABASE_URL, CLERK_KEY, IMAGEKIT keys
+
+# 4. Run Prisma migration
+npx prisma migrate dev
+
+# 5. Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# ScroolX
-# ScroolX
