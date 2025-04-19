@@ -8,6 +8,7 @@ import { Card, CardFooter } from "../ui/card";
 import { Heart, MessageCircle, Eye, Music, MapPin, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CommentSection from "./comment-section";
+import { useUser } from "@clerk/nextjs";
 
 const urlEndPoint = process.env.NEXT_PUBLIC_URL_ENDPOINT as string;
 console.log("ImageKit URL Endpoint:", urlEndPoint);
@@ -37,11 +38,11 @@ type ShortCardProps = {
     likes: number;
     views: number;
     duration: number;
-    thumbnailUrl?: string;
+    thumbnailUrl: string | null;
     isPublic: boolean;
     hashtags: string[];
-    music?: string;
-    location?: string;
+    music: string | null;
+    location: string | null;
     comments?: Comment[];
     user: {
       name: string;
@@ -57,6 +58,7 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>(short.comments || []);
   const router = useRouter();
+  const { user: currentUser } = useUser();
   const relativePath = short.url.startsWith(urlEndPoint)
     ? short.url.replace(urlEndPoint, "")
     : short.url;
@@ -109,32 +111,47 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
     setShowComments(!showComments);
   };
 
+  const handleCloseComments = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event bubbling
+    setShowComments(false);
+  };
+
   console.log("Short URL:", short.url);
   console.log("Relative Path for IKVideo:", relativePath);
 
   return (
-    <div className="relative">
-      <Card className="p-0 w-[360px] h-[640px] flex flex-col items-center justify-center overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 relative">
+    <div className="relative group">
+      <Card className="p-0 w-[360px] h-[640px] flex flex-col items-center justify-center overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 relative transform hover:scale-[1.02]">
         <ImageKitProvider urlEndpoint={urlEndPoint}>
-          <IKVideo
-            path={relativePath.startsWith("/") ? relativePath : `/${relativePath}`}
-            transformation={[{ height: "640", width: "360" }]}
-            autoPlay
-            muted
-            loop
-            controls
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <div className="absolute inset-0 w-full h-full transition-opacity duration-300">
+            <IKVideo
+              path={relativePath.startsWith("/") ? relativePath : `/${relativePath}`}
+              transformation={[{ height: "640", width: "360" }]}
+              autoPlay
+              muted
+              loop
+              controls
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
         </ImageKitProvider>
 
         {/* Channel Information */}
-        <CardFooter className="absolute bottom-20 -left-2 text-white">
+        <CardFooter className="absolute bottom-20 -left-2 text-white transition-all duration-300 transform group-hover:translate-y-0">
           <div>
             <div className="flex items-center space-x-2">
-              <Avatar>
-                <AvatarImage src="" alt="channel owner photo" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
+              <div className="transform transition-transform duration-300 hover:scale-110">
+                <Avatar className="w-10 h-10 border-2 border-white">
+                  <AvatarImage 
+                    src={currentUser?.imageUrl || ""} 
+                    alt={`${short.user.name}'s profile`}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                    {short.user.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
               <div className="flex flex-col">
                 <h3 className="font-semibold">{short.title}</h3>
                 <span className="text-sm">{short.user.name}</span>
@@ -147,17 +164,17 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
         </CardFooter>
 
         {/* Engagement Metrics */}
-        <div className="absolute right-4 bottom-20 flex flex-col items-center space-y-4">
-          <div className="flex flex-col items-center">
+        <div className="absolute right-4 bottom-20 flex flex-col items-center space-y-4 transition-all duration-300 transform group-hover:translate-x-0">
+          <div className="flex flex-col items-center transform transition-transform duration-300 hover:scale-110 active:scale-95">
             <Heart 
-              className={`w-6 h-6 cursor-pointer ${isLiked ? 'text-red-500' : 'text-white hover:text-red-500'}`}
+              className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${isLiked ? 'text-red-500' : 'text-white hover:text-red-500'}`}
               onClick={handleLike}
             />
             <span className="text-white text-sm">{likes}</span>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transform transition-transform duration-300 hover:scale-110 active:scale-95">
             <MessageCircle 
-              className={`w-6 h-6 cursor-pointer ${showComments ? 'text-blue-500' : 'text-white hover:text-blue-500'}`}
+              className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${showComments ? 'text-blue-500' : 'text-white hover:text-blue-500'}`}
               onClick={handleCommentClick}
             />
             <span className="text-white text-sm">{comments.length}</span>
@@ -169,15 +186,15 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
         </div>
 
         {/* Additional Metadata */}
-        <div className="absolute bottom-4 left-4 right-4 text-white text-sm">
+        <div className="absolute bottom-4 left-4 right-4 text-white text-sm transition-all duration-300 transform group-hover:translate-y-0">
           {short.music && (
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2 mb-2 transition-transform duration-300 hover:translate-x-1">
               <Music className="w-4 h-4" />
               <span>{short.music}</span>
             </div>
           )}
           {short.location && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 transition-transform duration-300 hover:translate-x-1">
               <MapPin className="w-4 h-4" />
               <span>{short.location}</span>
             </div>
@@ -185,7 +202,12 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
           {short.hashtags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {short.hashtags.map((tag, index) => (
-                <span key={index} className="text-blue-400">#{tag}</span>
+                <span 
+                  key={index} 
+                  className="text-blue-400 transition-transform duration-300 hover:scale-110 active:scale-95"
+                >
+                  #{tag}
+                </span>
               ))}
             </div>
           )}
@@ -194,14 +216,24 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
 
       {/* Comments Section */}
       {showComments && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10">
-          <div className="absolute top-4 right-4">
-            <X 
-              className="w-6 h-6 text-white cursor-pointer hover:text-gray-300"
-              onClick={() => setShowComments(false)}
-            />
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300"
+          onClick={handleCloseComments}
+        >
+          <div 
+            className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto transition-all duration-300 transform"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="absolute top-4 right-4 z-10">
+              <button
+                onClick={handleCloseComments}
+                className="p-2 rounded-full hover:bg-white/10 transition-all duration-300 transform hover:rotate-90 active:scale-90"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+            </div>
+            <CommentSection shortId={short.id} initialComments={comments} />
           </div>
-          <CommentSection shortId={short.id} initialComments={comments} />
         </div>
       )}
     </div>

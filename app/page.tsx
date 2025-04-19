@@ -1,5 +1,4 @@
 // app/page.tsx
-import Navbar from '@/components/header/navbar';
 import ShortCard from '@/components/shorts/short-card';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@clerk/nextjs/server';
@@ -40,13 +39,13 @@ export default async function Home() {
   });
 
   return (
-    <div className="h-screen overflow-y-scroll snap-y snap-mandatory">
-      <Navbar />
-      <div className="flex flex-col items-center">
-        {shorts.map((short) => (
+    <div className="h-screen overflow-y-scroll snap-y snap-mandatory animate-fade-in">
+      <div className="flex flex-col items-center animate-slide-up">
+        {shorts.map((short, index) => (
           <div
             key={short.id}
-            className="snap-start flex justify-center items-center h-screen"
+            className="snap-start flex justify-center items-center h-screen animate-fade-in"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
             <ShortCard short={short} />
           </div>
