@@ -21,6 +21,7 @@ model User {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
   shorts Shorts[]
+  comments Comment[]
 }
 
 model Shorts {
@@ -32,4 +33,28 @@ model Shorts {
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
   user User @relation(fields: [userId], references: [id])
+  comments Comment[]
+  
+  // Engagement metrics
+  likes Int @default(0)
+  views Int @default(0)
+  
+  // Additional metadata
+  duration Int @default(60)
+  thumbnailUrl String?
+  isPublic Boolean @default(true)
+  hashtags String[] @default([])
+  music String?
+  location String?
+}
+
+model Comment {
+  id String @id @default(cuid())
+  content String
+  userId String
+  shortsId String
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id])
+  shorts Shorts @relation(fields: [shortsId], references: [id])
 }
