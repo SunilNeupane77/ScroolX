@@ -7,8 +7,11 @@ interface CommentBody {
   content: string;
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    // Resolve the params Promise
+    const params = await context.params;
+
     // Get session from Clerk
     const { userId } = await auth();
     if (!userId) {
@@ -58,8 +61,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    // Resolve the params Promise
+    const params = await context.params;
+
     const comments = await prisma.comment.findMany({
       where: {
         shortsId: params.id,
