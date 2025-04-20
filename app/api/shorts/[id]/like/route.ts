@@ -1,13 +1,16 @@
-import { NextResponse, NextRequest } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function POST(req: NextRequest, { params }: Context) {
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     const { userId } = await auth();
     if (!userId) {
