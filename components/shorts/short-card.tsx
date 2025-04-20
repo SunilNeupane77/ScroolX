@@ -9,7 +9,6 @@ import CommentSection from "./comment-section";
 import { useUser } from "@clerk/nextjs";
 
 const urlEndPoint = process.env.NEXT_PUBLIC_URL_ENDPOINT as string;
-console.log("ImageKit URL Endpoint:", urlEndPoint);
 
 interface Comment {
   id: string;
