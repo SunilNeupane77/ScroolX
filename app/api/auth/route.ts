@@ -1,5 +1,5 @@
 import ImageKit from "imagekit";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 const imagekit = new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKITIO || process.env.PUBLIC_KEY || '',
@@ -7,7 +7,7 @@ const imagekit = new ImageKit({
   urlEndpoint: process.env.NEXT_PUBLIC_URL_ENDPOINT || process.env.NEXT_URL_ENDPOINT_IMAGEKITIO || ''
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     // Validate configuration
     if (!imagekit.options.publicKey || !imagekit.options.privateKey || !imagekit.options.urlEndpoint) {
