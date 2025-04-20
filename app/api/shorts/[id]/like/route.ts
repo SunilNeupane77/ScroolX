@@ -2,16 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function POST(req: NextRequest, { params }: Context) {
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = params;
+    // Resolve the params Promise
+    const params = await context.params;
 
+    // Get session from Clerk
     const { userId } = await auth();
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -19,8 +18,13 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     // Find the short
     const short = await prisma.shorts.findUnique({
-      where: { id },
-      select: { id: true, likes: true },
+      where: {
+        id: params.id,
+      },
+      select: {
+        id: true,
+        likes: true,
+      },
     });
 
     if (!short) {
@@ -29,14 +33,16 @@ export async function POST(req: NextRequest, { params }: Context) {
 
     // Increment likes count
     const updatedShort = await prisma.shorts.update({
-      where: { id },
+      where: {
+        id: params.id,
+      },
       data: {
         likes: short.likes + 1,
       },
     });
 
     return NextResponse.json(updatedShort);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[SHORTS_LIKE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
