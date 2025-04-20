@@ -2,31 +2,38 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-type RouteParams = {
-  id: string;
-};
+// Define the expected shape of the request body
+interface CommentBody {
+  content: string;
+}
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: RouteParams }
-) {
+// Define the context type for route params
+interface Context {
+  params: {
+    id: string;
+  };
+}
+
+export async function POST(req: NextRequest, context: Context) {
   try {
-    const session = await auth();
-    if (!session.userId) {
+    // Get session from Clerk
+    const { userId } = await auth();
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.json();
+    // Parse and validate request body
+    const body = await req.json() as CommentBody;
     const { content } = body;
 
     if (!content) {
       return new NextResponse("Content is required", { status: 400 });
     }
 
-    // Get the user from Clerk
+    // Get the user from Prisma
     const user = await prisma.user.findUnique({
       where: {
-        clerkUserId: session.userId,
+        clerkUserId: userId,
       },
     });
 
@@ -39,7 +46,7 @@ export async function POST(
       data: {
         content,
         userId: user.id,
-        shortsId: params.id,
+        shortsId: context.params.id,
       },
       include: {
         user: {
@@ -52,20 +59,17 @@ export async function POST(
     });
 
     return NextResponse.json(comment);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[SHORTS_COMMENT]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: RouteParams }
-) {
+export async function GET(req: NextRequest, context: Context) {
   try {
     const comments = await prisma.comment.findMany({
       where: {
-        shortsId: params.id,
+        shortsId: context.params.id,
       },
       include: {
         user: {
@@ -81,7 +85,7 @@ export async function GET(
     });
 
     return NextResponse.json(comments);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[SHORTS_COMMENTS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
