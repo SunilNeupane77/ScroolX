@@ -2,9 +2,15 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const session = await auth();
@@ -35,7 +41,7 @@ export async function POST(
       data: {
         content,
         userId: user.id,
-        shortsId: params.id,
+        shortsId: context.params.id,
       },
       include: {
         user: {
@@ -81,4 +87,4 @@ export async function GET(
     console.error("[SHORTS_COMMENTS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}
