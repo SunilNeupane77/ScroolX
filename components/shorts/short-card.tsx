@@ -1,12 +1,10 @@
 "use client";
 
-import type { Prisma } from "@prisma/client";
 import { IKVideo, ImageKitProvider } from "imagekitio-next";
 import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardFooter } from "../ui/card";
 import { Heart, MessageCircle, Eye, Music, MapPin, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import CommentSection from "./comment-section";
 import { useUser } from "@clerk/nextjs";
 
@@ -57,7 +55,6 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>(short.comments || []);
-  const router = useRouter();
   const { user: currentUser } = useUser();
   const relativePath = short.url.startsWith(urlEndPoint)
     ? short.url.replace(urlEndPoint, "")
