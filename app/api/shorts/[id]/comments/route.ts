@@ -7,14 +7,7 @@ interface CommentBody {
   content: string;
 }
 
-// Define the context type for route params
-interface Context {
-  params: {
-    id: string;
-  };
-}
-
-export async function POST(req: NextRequest, context: Context) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Get session from Clerk
     const { userId } = await auth();
@@ -46,7 +39,7 @@ export async function POST(req: NextRequest, context: Context) {
       data: {
         content,
         userId: user.id,
-        shortsId: context.params.id,
+        shortsId: params.id,
       },
       include: {
         user: {
@@ -65,11 +58,11 @@ export async function POST(req: NextRequest, context: Context) {
   }
 }
 
-export async function GET(req: NextRequest, context: Context) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const comments = await prisma.comment.findMany({
       where: {
-        shortsId: context.params.id,
+        shortsId: params.id,
       },
       include: {
         user: {
