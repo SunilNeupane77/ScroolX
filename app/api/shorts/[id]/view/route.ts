@@ -6,14 +6,16 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const { id } = params;
+
+    if (!id) {
+      return new NextResponse("Short ID is required", { status: 400 });
+    }
+
+    // Find the short
     const short = await prisma.shorts.findUnique({
-      where: {
-        id: params.id,
-      },
-      select: {
-        id: true,
-        views: true,
-      },
+      where: { id },
+      select: { id: true, views: true },
     });
 
     if (!short) {
@@ -22,9 +24,7 @@ export async function POST(
 
     // Increment views count
     const updatedShort = await prisma.shorts.update({
-      where: {
-        id: params.id,
-      },
+      where: { id },
       data: {
         views: short.views + 1,
       },
@@ -35,4 +35,4 @@ export async function POST(
     console.error("[SHORTS_VIEW]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}

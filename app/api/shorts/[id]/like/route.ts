@@ -4,22 +4,20 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
-    if (!session.userId) {
+    const { id } = context.params;
+
+    const { userId } = await auth();
+    if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Find the short
     const short = await prisma.shorts.findUnique({
-      where: {
-        id: params.id,
-      },
-      select: {
-        id: true,
-        likes: true,
-      },
+      where: { id },
+      select: { id: true, likes: true },
     });
 
     if (!short) {
@@ -28,9 +26,7 @@ export async function POST(
 
     // Increment likes count
     const updatedShort = await prisma.shorts.update({
-      where: {
-        id: params.id,
-      },
+      where: { id },
       data: {
         likes: short.likes + 1,
       },
@@ -41,4 +37,4 @@ export async function POST(
     console.error("[SHORTS_LIKE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}
