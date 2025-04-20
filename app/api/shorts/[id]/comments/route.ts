@@ -2,15 +2,9 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-type RouteParams = {
-  params: {
-    id: string;
-  };
-};
-
 export async function POST(
   req: NextRequest,
-  context: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await auth();
@@ -41,7 +35,7 @@ export async function POST(
       data: {
         content,
         userId: user.id,
-        shortsId: context.params.id,
+        shortsId: params.id,
       },
       include: {
         user: {
@@ -62,12 +56,12 @@ export async function POST(
 
 export async function GET(
   req: NextRequest,
-  context: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const comments = await prisma.comment.findMany({
       where: {
-        shortsId: context.params.id,
+        shortsId: params.id,
       },
       include: {
         user: {
