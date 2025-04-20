@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, context: { params: { id: string } }) {
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
-    const { id } = context.params;
+    const params = await context.params; // Resolve the Promise
+    const { id } = params;
 
     if (!id) {
       return new NextResponse("Short ID is required", { status: 400 });
