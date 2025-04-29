@@ -55,18 +55,23 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>(short.comments || []);
   const { user: currentUser } = useUser();
+
   const relativePath = short.url.startsWith(urlEndPoint)
     ? short.url.replace(urlEndPoint, "")
-    : short.url;
+    : short.url.startsWith("/")
+    ? short.url
+    : `/${short.url}`;
 
   useEffect(() => {
     // Track view when component mounts
     const trackView = async () => {
       try {
-        await fetch(`/api/shorts/${short.id}/view`, {
+        const response = await fetch(`/api/shorts/${short.id}/view`, {
           method: "POST",
         });
-        setViews((prev) => prev + 1);
+        if (response.ok) {
+          setViews((prev) => prev + 1);
+        }
       } catch (error) {
         console.error("Error tracking view:", error);
       }
@@ -82,7 +87,6 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
       const response = await fetch(`/api/shorts/${short.id}/like`, {
         method: "POST",
       });
-
       if (response.ok) {
         setLikes((prev) => prev + 1);
         setIsLiked(true);
@@ -112,9 +116,6 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
     setShowComments(false);
   };
 
-  console.log("Short URL:", short.url);
-  console.log("Relative Path for IKVideo:", relativePath);
-
   return (
     <div className="relative group">
       <Card className="p-0 w-[360px] h-[640px] flex flex-col items-center justify-center overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 relative transform hover:scale-[1.02]">
@@ -138,13 +139,13 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
             <div className="flex items-center space-x-2">
               <div className="transform transition-transform duration-300 hover:scale-110">
                 <Avatar className="w-10 h-10 border-2 border-white">
-                  <AvatarImage 
-                    src={currentUser?.imageUrl || ""} 
+                  <AvatarImage
+                    src={currentUser?.imageUrl || ""}
                     alt={`${short.user.name}'s profile`}
                     className="object-cover"
                   />
                   <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                    {short.user.name.split(' ').map(n => n[0]).join('')}
+                    {short.user.name.split(" ").map((n) => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -162,21 +163,37 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
         {/* Engagement Metrics */}
         <div className="absolute right-4 bottom-20 flex flex-col items-center space-y-4 transition-all duration-300 transform group-hover:translate-x-0">
           <div className="flex flex-col items-center transform transition-transform duration-300 hover:scale-110 active:scale-95">
-            <Heart 
-              className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${isLiked ? 'text-red-500' : 'text-white hover:text-red-500'}`}
+            <button
+              type="button"
+              aria-label={isLiked ? "Unlike" : "Like"}
               onClick={handleLike}
-            />
+            >
+              <Heart
+                className={`w-6 h-6 transition-colors duration-300 ${
+                  isLiked ? "text-red-500" : "text-white hover:text-red-500"
+                }`}
+              />
+            </button>
             <span className="text-white text-sm">{likes}</span>
           </div>
           <div className="flex flex-col items-center transform transition-transform duration-300 hover:scale-110 active:scale-95">
-            <MessageCircle 
-              className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${showComments ? 'text-blue-500' : 'text-white hover:text-blue-500'}`}
+            <button
+              type="button"
+              aria-label="View comments"
               onClick={handleCommentClick}
-            />
+            >
+              <MessageCircle
+                className={`w-6 h-6 transition-colors duration-300 ${
+                  showComments
+                    ? "text-blue-500"
+                    : "text-white hover:text-blue-500"
+                }`}
+              />
+            </button>
             <span className="text-white text-sm">{comments.length}</span>
           </div>
           <div className="flex flex-col items-center">
-            <Eye className="w-6 h-6 text-white" />
+            <Eye className="w-6 h-6 text-white" aria-hidden="true" />
             <span className="text-white text-sm">{views}</span>
           </div>
         </div>
@@ -185,21 +202,21 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
         <div className="absolute bottom-4 left-4 right-4 text-white text-sm transition-all duration-300 transform group-hover:translate-y-0">
           {short.music && (
             <div className="flex items-center space-x-2 mb-2 transition-transform duration-300 hover:translate-x-1">
-              <Music className="w-4 h-4" />
+              <Music className="w-4 h-4" aria-hidden="true" />
               <span>{short.music}</span>
             </div>
           )}
           {short.location && (
             <div className="flex items-center space-x-2 transition-transform duration-300 hover:translate-x-1">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-4 h-4" aria-hidden="true" />
               <span>{short.location}</span>
             </div>
           )}
           {short.hashtags?.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
               {short.hashtags.map((tag, index) => (
-                <span 
-                  key={index} 
+                <span
+                  key={index}
                   className="text-blue-400 transition-transform duration-300 hover:scale-110 active:scale-95"
                 >
                   #{tag}
@@ -212,11 +229,11 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
 
       {/* Comments Section */}
       {showComments && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300"
           onClick={handleCloseComments}
         >
-          <div 
+          <div
             className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto transition-all duration-300 transform"
             onClick={(e) => e.stopPropagation()}
           >
