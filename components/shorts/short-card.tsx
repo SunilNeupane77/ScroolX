@@ -1,12 +1,12 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
 import { IKVideo, ImageKitProvider } from "imagekitio-next";
-import React, { useState, useEffect } from "react";
+import { Eye, Heart, MapPin, MessageCircle, Music, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Card, CardFooter } from "../ui/card";
-import { Heart, MessageCircle, Eye, Music, MapPin, X } from "lucide-react";
 import CommentSection from "./comment-section";
-import { useUser } from "@clerk/nextjs";
 
 const urlEndPoint = process.env.NEXT_PUBLIC_URL_ENDPOINT as string;
 
@@ -222,6 +222,8 @@ const ShortCard: React.FC<ShortCardProps> = ({ short }) => {
           >
             <div className="absolute top-4 right-4 z-10">
               <button
+                type="button"
+                aria-label="Close comments"
                 onClick={handleCloseComments}
                 className="p-2 rounded-full hover:bg-white/10 transition-all duration-300 transform hover:rotate-90 active:scale-90"
               >
