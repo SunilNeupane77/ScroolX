@@ -19,6 +19,7 @@ type UploadShortsState = {
         formError?: string[],
     }
 }
+// code carry out the upload action
 
 export const uploadShortsAction = async (prevState: UploadShortsState, formData: FormData): Promise<UploadShortsState> => {
 
