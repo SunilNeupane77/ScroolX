@@ -19,6 +19,7 @@ type UploadShortsState = {
         formError?: string[],
     }
 }
+// code carry out the upload action
 
 export const uploadShortsAction = async (prevState: UploadShortsState, formData: FormData): Promise<UploadShortsState> => {
 
@@ -44,7 +45,7 @@ export const uploadShortsAction = async (prevState: UploadShortsState, formData:
             }
         }
     }
-    console.log("working...");
+    // removed the log in production environment
     
     const user = await prisma.user.findUnique({
         where: { clerkUserId: userId }
