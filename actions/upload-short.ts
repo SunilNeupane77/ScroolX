@@ -45,7 +45,7 @@ export const uploadShortsAction = async (prevState: UploadShortsState, formData:
             }
         }
     }
-    console.log("working...");
+    // removed the log in production environment
     
     const user = await prisma.user.findUnique({
         where: { clerkUserId: userId }
